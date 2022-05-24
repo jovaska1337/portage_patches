@@ -1,0 +1,65 @@
+https://trac.transmissionbt.com/ticket/4537#comment:4
+---
+
+diff --git a/libtransmission/torrent.c b/libtransmission/torrent.c
+index c79edf5f9..1863215c7 100644
+--- a/libtransmission/torrent.c
++++ b/libtransmission/torrent.c
+@@ -915,13 +915,27 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
+     if (disappeared)
+     {
+         tr_deeplog_tor(tor, "%s", "[LAZY] uh oh, the files disappeared");
+-        tr_torrentSetLocalError(tor, "%s", _("No data found! Ensure your drives are connected or use \"Set Location\". "
+-            "To re-download, remove the torrent and re-add it."));
++        tr_torrentSetLocalError(tor, "%s", _("No data found! Use \"Set Location\" or remove and re-add the torrent. "
++            "You may also re-verify the torrent to re-download it."));
+     }
+ 
+     return disappeared;
+ }
+ 
++static bool localErrFilesDisappearedUE( tr_torrent * tor )
++{
++    const bool disappeared = ( tr_cpHaveTotal( &tor->completion ) > 0 ) && !hasAnyLocalData( tor );
++
++    if( disappeared )
++    {
++        tr_deeplog_tor( tor, "%s", "[LAZY] uh oh WARNING, the files disappeared" );
++        tr_torrentSetLocalError( tor, "%s", _( "WARNING! possible user error! files MAYBE disappeared!!! to IGNORE: after verify use Start/Resume Now" ) );
++    }
++
++    return disappeared;
++}
++
++
+ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
+ {
+     tr_session* session = tr_ctorGetSession(ctor);
+@@ -1859,8 +1873,8 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
+         break;
+     }
+ 
+-    /* don't allow the torrent to be started if the files disappeared */
+-    if (setLocalErrorIfFilesDisappeared(tor))
++    /* IGNORE the error and start if Start/Resume Now issued */
++    if( !bypass_queue && localErrFilesDisappearedUE( tor ) )
+     {
+         return;
+     }
+@@ -1983,14 +1997,11 @@ static void verifyTorrent(void* vdata)
+ 
+     tor->startAfterVerify = startAfter;
+ 
+-    if (setLocalErrorIfFilesDisappeared(tor))
++    if( localErrFilesDisappearedUE( tor ) )
+     {
+         tor->startAfterVerify = false;
+     }
+-    else
+-    {
+-        tr_verifyAdd(tor, onVerifyDone, data);
+-    }
++    tr_verifyAdd(tor, onVerifyDone, data);
+ 
+ unlock:
+     tr_sessionUnlock(tor->session);

@@ -1,0 +1,108 @@
+diff --git a/modules.d/99tmpfs-single/module-setup.sh b/modules.d/99tmpfs-single/module-setup.sh
+new file mode 100755
+index 0000000..0af21ec
+--- a/modules.d/99tmpfs-single/module-setup.sh
++++ b/modules.d/99tmpfs-single/module-setup.sh
+@@ -0,0 +1,33 @@
++#!/bin/bash
++# This is a custom module which currently just handles tmpfs mounting.
++# 
++
++check() {
++	return 0
++}
++
++depends() {
++	return 0
++}
++
++install() {
++	# installing the whole system fstab will fuck
++	# with systemd because mounting everything isn't
++	# possible until we have access to the disk
++	# decryption keys, so we filter /run and /tmp
++	# from the system fstab and put them into
++	# the initrd's /etc/fstab
++
++	fstab_out="$initdir/etc/fstab"
++	# we don't want to overwrite the existing fstab
++	[ "$fstab_out" == '/etc/fstab' ] && exit 1
++
++	# we have to prepend /sysroot to all paths in the
++	# host fstab to maintain consistensy
++	grep 'tmpfs\s*/run\|/run/tmp' /etc/fstab \
++		| sed -e 's@\s\+@ @g' \
++		| sed -e 's@\B/@/sysroot/@g' > "$fstab_out"
++
++	# tmpfs mount hook
++	inst_hook pre-pivot 99 "$moddir/mount-tmpfs.sh"
++}
+diff --git a/modules.d/99tmpfs-single/mount-tmpfs.sh b/modules.d/99tmpfs-single/mount-tmpfs.sh
+new file mode 100755
+index 0000000..01dc2ef
+--- a/modules.d/99tmpfs-single/mount-tmpfs.sh
++++ b/modules.d/99tmpfs-single/mount-tmpfs.sh
+@@ -0,0 +1,51 @@
++#!/bin/sh
++
++# make sure /run and /tmp are empty
++for dir in "$NEWROOT/run" "$NEWROOT/tmp"; do
++	if [ ! -d "$dir" ]; then
++		# files need to be removed
++		[ -f "$dir" ] \
++			&& info "Removing file $dir" \
++			&& rm "$dir" 2>/dev/null
++
++		info "Creating directory $dir"
++		mkdir "$dir" 2>/dev/null
++	else
++		info "Emptying directory $dir"
++		find "$dir" -mindepth 1 -maxdepth 1 -exec rm -r {} \;
++	fi
++done
++
++# we attempt to use /etc/fstab, otherwise
++# fall back to the hard coded options here
++
++info 'Mounting /run as tmpfs'
++if [ ! -f '/etc/fstab' ] || ! mount "$NEWROOT/run" 2>/dev/null; then
++	warn 'Failed to mount /run from fstab.'
++	warn 'Falling back to hard coded options.'
++
++	# systemd wants these options for /run, don't know about OpenRC
++	mount -t tmpfs -o mode=755,nodev,nosuid,strictatime \
++		tmpfs "$NEWROOT/run" 2>/dev/null || warn 'Failed to mount /run'
++fi
++
++if findmnt "$NEWROOT/run"; then 
++	# if /run was mounted successfully, mount /run and /tmp
++	# on the same tmpfs
++	info 'Mounting /tmp on /run/tmp'
++	mkdir "$NEWROOT/run/tmp" \
++		&& chmod 1777 "$NEWROOT/run/tmp" \
++		|| die 'Failed to create /run/tmp'
++	if [ ! -f '/etc/fstab' ] || ! mount "$NEWROOT/tmp" 2>/dev/null; then
++		warn 'Failed to mount /tmp from fstab.'
++		warn 'Falling back to hard coded options.'
++
++		mount -o rbind "$NEWROOT/run/tmp" "$NEWROOT/tmp" 2>/dev/null \
++			|| warn 'Failed to mount /tmp'
++	fi
++else
++	# otherwise attempt to mount /tmp as a tmpfs
++	warn 'Mounting /tmp as tmpfs'
++	mount -t tmpfs -o mode=755,nodev,nosuid,strictatime \
++		tmpfs "$NEWROOT/tmp" 2>/dev/null || warn 'Failed to mount /tmp'
++fi
+diff --git a/pkgbuild/dracut.spec b/pkgbuild/dracut.spec
+index 04c61f9..065fee8 100644
+--- a/pkgbuild/dracut.spec
++++ b/pkgbuild/dracut.spec
+@@ -382,6 +382,7 @@ echo 'dracut_rescue_image="yes"' > $RPM_BUILD_ROOT%{dracutlibdir}/dracut.conf.d/
+ %{dracutlibdir}/modules.d/95terminfo
+ %{dracutlibdir}/modules.d/95udev-rules
+ %{dracutlibdir}/modules.d/95virtfs
++%{dracutlibdir}/modules.d/99-tmpfs-single
+ %ifarch s390 s390x
+ %{dracutlibdir}/modules.d/80cms
+ %{dracutlibdir}/modules.d/81cio_ignore

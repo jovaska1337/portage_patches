@@ -1,0 +1,107 @@
+diff --git a/modules.d/90crypt/ask_password_helper.sh b/modules.d/90crypt/ask_password_helper.sh
+new file mode 100755
+index 0000000..9fc9f51
+--- a/modules.d/90crypt/ask_password_helper.sh
++++ b/modules.d/90crypt/ask_password_helper.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh
++
++# first parameter is the key name rest of them
++# are the user specified program. we don't need
++# to care about space, as plymouth doesn't either
++name="$1"
++shift
++
++# pipe the first line of stdin into
++# keyctl and a user specified program
++((head -n1 | tee /dev/fd/5 | \
++	keyctl padd user "$name" @u &>/dev/null) 5>&1 | $@) 4>&1
+diff --git a/modules.d/90crypt/crypt-lib.sh b/modules.d/90crypt/crypt-lib.sh
+index 7a88643..0205642 100755
+--- a/modules.d/90crypt/crypt-lib.sh
++++ b/modules.d/90crypt/crypt-lib.sh
+@@ -48,6 +48,10 @@ crypttab_contains() {
+ # --tty-echo-off
+ #   Turn off input echo before tty command is executed and turn on after.
+ #   It's useful when password is read from stdin.
++# --key-name name
++#   Insert the password into the user keyring for later usage.
++#   (This can be used by pam_gdm.so to unlock a GNOME keyring
++#    without a password when name == "cryptsetup")
+ ask_for_password() {
+     local ply_cmd
+     local ply_prompt
+@@ -55,6 +59,7 @@ ask_for_password() {
+     local tty_cmd
+     local tty_prompt
+     local tty_tries=3
++    local key_name
+     local ret
+ 
+     while [ $# -gt 0 ]; do
+@@ -99,10 +104,21 @@ ask_for_password() {
+                 shift
+                 ;;
+             --tty-echo-off) tty_echo_off=yes ;;
++	    --key-name)
++		key_name="$2"
++		shift
++	    	;;
+         esac
+         shift
+     done
+ 
++    # should we add the key to the root user's keyring?
++    if [ ! -z "$key_name" ] && command -v keyctl &>/dev/null; then
++    	# modify the commands to pipe the password to keyctl
++	ply_cmd="ask_password_helper ${key_name} ${ply_cmd}"
++	tty_cmd="ask_password_helper ${key_name} ${tty_cmd}"
++    fi
++
+     {
+         flock -s 9
+         # Prompt for password with plymouth, if installed and running.
+diff --git a/modules.d/90crypt/cryptroot-ask.sh b/modules.d/90crypt/cryptroot-ask.sh
+index b1f8df8..346794b 100755
+--- a/modules.d/90crypt/cryptroot-ask.sh
++++ b/modules.d/90crypt/cryptroot-ask.sh
+@@ -182,7 +182,8 @@ if [ $ask_passphrase -ne 0 ]; then
+         --ply-cmd "$luks_open -T1 $device $luksname" \
+         --ply-prompt "Password ($device)" \
+         --tty-tries 1 \
+-        --tty-cmd "$luks_open -T5 -t $_timeout $device $luksname"
++        --tty-cmd "$luks_open -T5 -t $_timeout $device $luksname" \
++	--key-name cryptsetup
+     unset luks_open
+     unset _timeout
+ fi
+diff --git a/modules.d/90crypt/module-setup.sh b/modules.d/90crypt/module-setup.sh
+index acb9cf8..1f13e07 100755
+--- a/modules.d/90crypt/module-setup.sh
++++ b/modules.d/90crypt/module-setup.sh
+@@ -6,6 +6,9 @@ check() {
+     # if cryptsetup is not installed, then we cannot support encrypted devices.
+     require_any_binary "$systemdutildir"/systemd-cryptsetup cryptsetup || return 1
+ 
++    # keyctl is optional, if it's detected by install() it's included
++    # and ask_password can store keys in the kernel keyring
++
+     [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == "crypto_LUKS" ]] && return 0
+@@ -87,8 +90,15 @@ install() {
+         inst_multiple cryptsetup rmdir readlink umount
+         inst_script "$moddir"/cryptroot-ask.sh /sbin/cryptroot-ask
+         inst_script "$moddir"/probe-keydev.sh /sbin/probe-keydev
++
+         inst_hook cmdline 10 "$moddir/parse-keydev.sh"
+         inst_hook cleanup 30 "$moddir/crypt-cleanup.sh"
++
++	# keyctl if present
++	if find_binary keyctl &>/dev/null; then
++		inst_multiple keyctl tee
++		inst_script "$moddir"/ask_password_helper.sh /bin/ask_password_helper
++	fi
+     fi
+ 
+     if [[ $hostonly ]] && [[ -f $dracutsysrootdir/etc/crypttab ]]; then
