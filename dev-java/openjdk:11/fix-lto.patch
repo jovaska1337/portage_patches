@@ -1,0 +1,30 @@
+--- a/src/hotspot/share/gc/g1/g1CodeBlobClosure.cpp
++++ b/src/hotspot/share/gc/g1/g1CodeBlobClosure.cpp
+@@ -26,6 +26,7 @@
+ #include "code/nmethod.hpp"
+ #include "gc/g1/g1CodeBlobClosure.hpp"
+ #include "gc/g1/g1CollectedHeap.inline.hpp"
++#include "gc/g1/g1OopClosures.inline.hpp"
+ #include "gc/g1/heapRegion.hpp"
+ #include "gc/g1/heapRegionRemSet.hpp"
+ #include "oops/access.inline.hpp"
+--- a/src/hotspot/share/gc/g1/g1HeapVerifier.cpp
++++ b/src/hotspot/share/gc/g1/g1HeapVerifier.cpp
+@@ -28,6 +28,7 @@
+ #include "gc/g1/g1CollectedHeap.inline.hpp"
+ #include "gc/g1/g1ConcurrentMarkThread.hpp"
+ #include "gc/g1/g1HeapVerifier.hpp"
++#include "gc/g1/g1OopClosures.inline.hpp"
+ #include "gc/g1/g1Policy.hpp"
+ #include "gc/g1/g1RemSet.hpp"
+ #include "gc/g1/g1RootProcessor.hpp"
+--- a/src/hotspot/share/gc/g1/g1StringDedupQueue.cpp
++++ b/src/hotspot/share/gc/g1/g1StringDedupQueue.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/javaClasses.inline.hpp"
+ #include "gc/g1/g1CollectedHeap.hpp"
++#include "gc/g1/g1OopClosures.inline.hpp"
+ #include "gc/g1/g1StringDedup.hpp"
+ #include "gc/g1/g1StringDedupQueue.hpp"
+ #include "logging/log.hpp"

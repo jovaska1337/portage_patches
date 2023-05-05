@@ -1,3 +1,5 @@
+diff --git a/gtk/gtkfilechooserprivate.h b/gtk/gtkfilechooserprivate.h
+index a0a622c111..2af859433d 100644
 --- a/gtk/gtkfilechooserprivate.h
 +++ b/gtk/gtkfilechooserprivate.h
 @@ -32,10 +32,14 @@
@@ -91,6 +93,8 @@
  GSList *       _gtk_file_chooser_list_shortcut_folder_files (GtkFileChooser *chooser);
  
  
+diff --git a/gtk/gtkfilechooserwidget.c b/gtk/gtkfilechooserwidget.c
+index d75a3f7857..623c71e84a 100644
 --- a/gtk/gtkfilechooserwidget.c
 +++ b/gtk/gtkfilechooserwidget.c
 @@ -44,10 +44,12 @@
@@ -2023,6 +2027,8 @@
    return NULL;
  }
 -
+diff --git a/gtk/org.gtk.Settings.FileChooser.gschema.xml b/gtk/org.gtk.Settings.FileChooser.gschema.xml
+index dda603ab61..d0f275a01e 100644
 --- a/gtk/org.gtk.Settings.FileChooser.gschema.xml
 +++ b/gtk/org.gtk.Settings.FileChooser.gschema.xml
 @@ -55,6 +55,11 @@
@@ -2144,6 +2150,8 @@
        </description>
      </key>
      <key name="clock-format" enum="org.gtk.Settings.FileChooser.ClockFormat">
+diff --git a/gtk/ui/gtkfilechooserwidget.ui b/gtk/ui/gtkfilechooserwidget.ui
+index 01d4075f6c..269a95fd4b 100644
 --- a/gtk/ui/gtkfilechooserwidget.ui
 +++ b/gtk/ui/gtkfilechooserwidget.ui
 @@ -8,6 +8,56 @@

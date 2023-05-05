@@ -1,0 +1,490 @@
+--- a/hotspot/src/share/vm/classfile/classLoaderData.cpp
++++ b/hotspot/src/share/vm/classfile/classLoaderData.cpp
+@@ -53,6 +53,7 @@
+ #include "classfile/metadataOnStackMark.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "code/codeCache.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/gcLocker.hpp"
+ #include "memory/metadataFactory.hpp"
+ #include "memory/metaspaceShared.hpp"
+--- a/hotspot/src/share/vm/classfile/dictionary.cpp
++++ b/hotspot/src/share/vm/classfile/dictionary.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/dictionary.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/systemDictionaryShared.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/iterator.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "prims/jvmtiRedefineClassesTrace.hpp"
+--- a/hotspot/src/share/vm/classfile/symbolTable.cpp
++++ b/hotspot/src/share/vm/classfile/symbolTable.cpp
+@@ -27,6 +27,7 @@
+ #include "classfile/javaClasses.hpp"
+ #include "classfile/symbolTable.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "memory/filemap.hpp"
+--- a/hotspot/src/share/vm/classfile/systemDictionary.cpp
++++ b/hotspot/src/share/vm/classfile/systemDictionary.cpp
+@@ -36,6 +36,7 @@
+ #endif
+ #include "classfile/vmSymbols.hpp"
+ #include "compiler/compileBroker.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/bytecodeStream.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "jfr/jfrEvents.hpp"
+--- a/hotspot/src/share/vm/code/nmethod.cpp
++++ b/hotspot/src/share/vm/code/nmethod.cpp
+@@ -33,6 +33,7 @@
+ #include "compiler/compileLog.hpp"
+ #include "compiler/compilerOracle.hpp"
+ #include "compiler/disassembler.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/bytecode.hpp"
+ #include "oops/methodData.hpp"
+ #include "prims/jvmtiRedefineClassesTrace.hpp"
+--- a/hotspot/src/share/vm/compiler/oopMap.cpp
++++ b/hotspot/src/share/vm/compiler/oopMap.cpp
+@@ -28,6 +28,7 @@
+ #include "code/nmethod.hpp"
+ #include "code/scopeDesc.hpp"
+ #include "compiler/oopMap.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "memory/resourceArea.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.cpp
++++ b/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.cpp
+@@ -27,6 +27,7 @@
+ #include "gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.hpp"
+ #include "gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.inline.hpp"
+ #include "gc_implementation/concurrentMarkSweep/concurrentMarkSweepThread.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/liveRange.hpp"
+ #include "gc_implementation/shared/spaceDecorator.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.cpp
++++ b/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.cpp
+@@ -35,6 +35,7 @@
+ #include "gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.inline.hpp"
+ #include "gc_implementation/concurrentMarkSweep/concurrentMarkSweepThread.hpp"
+ #include "gc_implementation/concurrentMarkSweep/vmCMSOperations.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parNew/parNewGeneration.hpp"
+ #include "gc_implementation/shared/collectorCounters.hpp"
+ #include "gc_implementation/shared/gcTimer.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/g1/g1CodeCacheRemSet.cpp
++++ b/hotspot/src/share/vm/gc_implementation/g1/g1CodeCacheRemSet.cpp
+@@ -26,6 +26,7 @@
+ #include "code/codeCache.hpp"
+ #include "code/nmethod.hpp"
+ #include "gc_implementation/g1/g1CodeCacheRemSet.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/g1/heapRegion.hpp"
+ #include "memory/heap.hpp"
+ #include "memory/iterator.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/g1/g1RootProcessor.cpp
++++ b/hotspot/src/share/vm/gc_implementation/g1/g1RootProcessor.cpp
+@@ -31,6 +31,7 @@
+ #include "gc_implementation/g1/g1CollectedHeap.inline.hpp"
+ #include "gc_implementation/g1/g1CollectorPolicy.hpp"
+ #include "gc_implementation/g1/g1GCPhaseTimes.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/g1/g1RemSet.inline.hpp"
+ #include "gc_implementation/g1/g1RootProcessor.hpp"
+ #include "memory/allocation.inline.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupQueue.cpp
++++ b/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupQueue.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/javaClasses.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/g1/g1StringDedupQueue.hpp"
+ #include "memory/gcLocker.hpp"
+ #include "runtime/mutexLocker.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupTable.cpp
++++ b/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupTable.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/altHashing.hpp"
+ #include "classfile/javaClasses.hpp"
+ #include "gc_implementation/g1/g1CollectedHeap.inline.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/g1/g1SATBCardTableModRefBS.hpp"
+ #include "gc_implementation/g1/g1StringDedupTable.hpp"
+ #include "gc_implementation/shared/concurrentGCThread.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/parNew/parNewGeneration.cpp
++++ b/hotspot/src/share/vm/gc_implementation/parNew/parNewGeneration.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parNew/parNewGeneration.hpp"
+ #include "gc_implementation/parNew/parOopClosures.inline.hpp"
+ #include "gc_implementation/shared/adaptiveSizePolicy.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/parallelScavenge/cardTableExtension.cpp
++++ b/hotspot/src/share/vm/gc_implementation/parallelScavenge/cardTableExtension.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parallelScavenge/cardTableExtension.hpp"
+ #include "gc_implementation/parallelScavenge/gcTaskManager.hpp"
+ #include "gc_implementation/parallelScavenge/parallelScavengeHeap.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/parallelScavenge/psParallelCompact.cpp
++++ b/hotspot/src/share/vm/gc_implementation/parallelScavenge/psParallelCompact.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/symbolTable.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "code/codeCache.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parallelScavenge/gcTaskManager.hpp"
+ #include "gc_implementation/parallelScavenge/parallelScavengeHeap.inline.hpp"
+ #include "gc_implementation/parallelScavenge/pcTasks.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/parallelScavenge/psScavenge.cpp
++++ b/hotspot/src/share/vm/gc_implementation/parallelScavenge/psScavenge.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/symbolTable.hpp"
+ #include "code/codeCache.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parallelScavenge/cardTableExtension.hpp"
+ #include "gc_implementation/parallelScavenge/gcTaskManager.hpp"
+ #include "gc_implementation/parallelScavenge/parallelScavengeHeap.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/parallelScavenge/psTasks.cpp
++++ b/hotspot/src/share/vm/gc_implementation/parallelScavenge/psTasks.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "code/codeCache.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/parallelScavenge/cardTableExtension.hpp"
+ #include "gc_implementation/parallelScavenge/gcTaskManager.hpp"
+ #include "gc_implementation/parallelScavenge/psMarkSweep.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/shared/markSweep.cpp
++++ b/hotspot/src/share/vm/gc_implementation/shared/markSweep.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "compiler/compileBroker.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/gcTimer.hpp"
+ #include "gc_implementation/shared/gcTrace.hpp"
+ #include "gc_implementation/shared/markSweep.inline.hpp"
+--- a/hotspot/src/share/vm/gc_implementation/shared/mutableSpace.cpp
++++ b/hotspot/src/share/vm/gc_implementation/shared/mutableSpace.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "utilities/macros.hpp"
+ #if INCLUDE_ALL_GCS
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/mutableSpace.hpp"
+ #include "gc_implementation/shared/spaceDecorator.hpp"
+ #include "oops/oop.inline.hpp"
+--- a/hotspot/src/share/vm/memory/cardTableRS.cpp
++++ b/hotspot/src/share/vm/memory/cardTableRS.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "memory/cardTableRS.hpp"
+ #include "memory/genCollectedHeap.hpp"
+--- a/hotspot/src/share/vm/memory/defNewGeneration.cpp
++++ b/hotspot/src/share/vm/memory/defNewGeneration.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/collectorCounters.hpp"
+ #include "gc_implementation/shared/gcPolicyCounters.hpp"
+ #include "gc_implementation/shared/gcHeapSummary.hpp"
+--- a/hotspot/src/share/vm/memory/referenceProcessor.cpp
++++ b/hotspot/src/share/vm/memory/referenceProcessor.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/javaClasses.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/gcTimer.hpp"
+ #include "gc_implementation/shared/gcTraceTime.hpp"
+ #include "gc_interface/collectedHeap.hpp"
+--- a/hotspot/src/share/vm/memory/universe.cpp
++++ b/hotspot/src/share/vm/memory/universe.cpp
+@@ -34,6 +34,7 @@
+ #include "classfile/vmSymbols.hpp"
+ #include "code/codeCache.hpp"
+ #include "code/dependencies.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "memory/cardTableModRefBS.hpp"
+--- a/hotspot/src/share/vm/oops/arrayKlass.cpp
++++ b/hotspot/src/share/vm/oops/arrayKlass.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/javaClasses.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "jvmtifiles/jvmti.h"
+ #include "memory/gcLocker.hpp"
+--- a/hotspot/src/share/vm/oops/instanceClassLoaderKlass.cpp
++++ b/hotspot/src/share/vm/oops/instanceClassLoaderKlass.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/javaClasses.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/markSweep.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "memory/genOopClosures.inline.hpp"
+--- a/hotspot/src/share/vm/oops/klass.cpp
++++ b/hotspot/src/share/vm/oops/klass.cpp
+@@ -27,6 +27,7 @@
+ #include "classfile/dictionary.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/markSweep.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "memory/heapInspection.hpp"
+--- a/hotspot/src/share/vm/oops/oop.cpp
++++ b/hotspot/src/share/vm/oops/oop.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/altHashing.hpp"
+ #include "classfile/javaClasses.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "runtime/handles.inline.hpp"
+ #include "runtime/thread.inline.hpp"
+--- a/hotspot/src/share/vm/precompiled/precompiled.hpp
++++ b/hotspot/src/share/vm/precompiled/precompiled.hpp
+@@ -305,6 +305,7 @@
+ # include "gc_implementation/g1/g1BlockOffsetTable.hpp"
+ # include "gc_implementation/g1/g1BlockOffsetTable.inline.hpp"
+ # include "gc_implementation/g1/g1OopClosures.hpp"
++# include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ # include "gc_implementation/g1/g1_globals.hpp"
+ # include "gc_implementation/g1/g1_specialized_oop_closures.hpp"
+ # include "gc_implementation/g1/ptrQueue.hpp"
+--- a/hotspot/src/share/vm/prims/jvmtiExport.cpp
++++ b/hotspot/src/share/vm/prims/jvmtiExport.cpp
+@@ -27,6 +27,7 @@
+ #include "code/nmethod.hpp"
+ #include "code/pcDesc.hpp"
+ #include "code/scopeDesc.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "jvmtifiles/jvmtiEnv.hpp"
+ #include "memory/resourceArea.hpp"
+--- a/hotspot/src/share/vm/prims/jvmtiImpl.cpp
++++ b/hotspot/src/share/vm/prims/jvmtiImpl.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "interpreter/oopMapCache.hpp"
+ #include "jvmtifiles/jvmtiEnv.hpp"
+--- a/hotspot/src/share/vm/prims/jvmtiTagMap.cpp
++++ b/hotspot/src/share/vm/prims/jvmtiTagMap.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/symbolTable.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "jvmtifiles/jvmtiEnv.hpp"
+ #include "oops/instanceMirrorKlass.hpp"
+ #include "oops/objArrayKlass.hpp"
+--- a/hotspot/src/share/vm/prims/jvmtiThreadState.cpp
++++ b/hotspot/src/share/vm/prims/jvmtiThreadState.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "jvmtifiles/jvmtiEnv.hpp"
+ #include "memory/gcLocker.hpp"
+ #include "memory/resourceArea.hpp"
+--- a/hotspot/src/share/vm/prims/privilegedStack.cpp
++++ b/hotspot/src/share/vm/prims/privilegedStack.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "oops/instanceKlass.hpp"
+ #include "oops/method.hpp"
+--- a/hotspot/src/share/vm/runtime/fprofiler.cpp
++++ b/hotspot/src/share/vm/runtime/fprofiler.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/classLoader.hpp"
+ #include "code/vtableStubs.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "memory/allocation.inline.hpp"
+--- a/hotspot/src/share/vm/runtime/frame.cpp
++++ b/hotspot/src/share/vm/runtime/frame.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "compiler/abstractCompiler.hpp"
+ #include "compiler/disassembler.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "interpreter/oopMapCache.hpp"
+--- a/hotspot/src/share/vm/runtime/handles.cpp
++++ b/hotspot/src/share/vm/runtime/handles.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "oops/constantPool.hpp"
+ #include "oops/oop.inline.hpp"
+--- a/hotspot/src/share/vm/runtime/javaCalls.cpp
++++ b/hotspot/src/share/vm/runtime/javaCalls.cpp
+@@ -27,6 +27,7 @@
+ #include "classfile/vmSymbols.hpp"
+ #include "code/nmethod.hpp"
+ #include "compiler/compileBroker.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "interpreter/linkResolver.hpp"
+ #include "memory/universe.inline.hpp"
+--- a/hotspot/src/share/vm/runtime/jniHandles.cpp
++++ b/hotspot/src/share/vm/runtime/jniHandles.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/iterator.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "prims/jvmtiExport.hpp"
+--- a/hotspot/src/share/vm/runtime/monitorChunk.cpp
++++ b/hotspot/src/share/vm/runtime/monitorChunk.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "precompiled.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/allocation.inline.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "runtime/monitorChunk.hpp"
+--- a/hotspot/src/share/vm/runtime/synchronizer.cpp
++++ b/hotspot/src/share/vm/runtime/synchronizer.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "jfr/jfrEvents.hpp"
+ #include "memory/resourceArea.hpp"
+ #include "oops/markOop.hpp"
+--- a/hotspot/src/share/vm/runtime/thread.cpp
++++ b/hotspot/src/share/vm/runtime/thread.cpp
+@@ -29,6 +29,7 @@
+ #include "classfile/vmSymbols.hpp"
+ #include "code/scopeDesc.hpp"
+ #include "compiler/compileBroker.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "interpreter/linkResolver.hpp"
+ #include "interpreter/oopMapCache.hpp"
+--- a/hotspot/src/share/vm/runtime/vframe_hp.cpp
++++ b/hotspot/src/share/vm/runtime/vframe_hp.cpp
+@@ -28,6 +28,7 @@
+ #include "code/nmethod.hpp"
+ #include "code/pcDesc.hpp"
+ #include "code/scopeDesc.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "interpreter/interpreter.hpp"
+ #include "interpreter/oopMapCache.hpp"
+ #include "oops/instanceKlass.hpp"
+--- a/hotspot/src/share/vm/runtime/vmThread.cpp
++++ b/hotspot/src/share/vm/runtime/vmThread.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "compiler/compileBroker.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_interface/collectedHeap.hpp"
+ #include "jfr/jfrEvents.hpp"
+ #include "jfr/support/jfrThreadId.hpp"
+--- a/hotspot/src/share/vm/runtime/vm_operations.cpp
++++ b/hotspot/src/share/vm/runtime/vm_operations.cpp
+@@ -27,6 +27,7 @@
+ #include "classfile/vmSymbols.hpp"
+ #include "compiler/compileBroker.hpp"
+ #include "compiler/compilerOracle.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/isGCActiveMark.hpp"
+ #include "memory/resourceArea.hpp"
+ #include "oops/symbol.hpp"
+--- a/hotspot/src/share/vm/services/heapDumper.cpp
++++ b/hotspot/src/share/vm/services/heapDumper.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/symbolTable.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "gc_implementation/shared/vmGCOperations.hpp"
+ #include "memory/gcLocker.inline.hpp"
+ #include "memory/genCollectedHeap.hpp"
+--- a/hotspot/src/share/vm/services/lowMemoryDetector.cpp
++++ b/hotspot/src/share/vm/services/lowMemoryDetector.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "runtime/interfaceSupport.hpp"
+ #include "runtime/java.hpp"
+--- a/hotspot/src/share/vm/services/memoryManager.cpp
++++ b/hotspot/src/share/vm/services/memoryManager.cpp
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "runtime/handles.inline.hpp"
+ #include "runtime/javaCalls.hpp"
+--- a/hotspot/src/share/vm/services/memoryPool.cpp
++++ b/hotspot/src/share/vm/services/memoryPool.cpp
+@@ -26,6 +26,7 @@
+ #include "classfile/systemDictionary.hpp"
+ #include "classfile/vmSymbols.hpp"
+ #include "memory/metaspace.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "runtime/handles.inline.hpp"
+ #include "runtime/javaCalls.hpp"
+--- a/hotspot/src/share/vm/services/threadService.cpp
++++ b/hotspot/src/share/vm/services/threadService.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "gc_implementation/g1/g1OopClosures.inline.hpp"
+ #include "memory/allocation.hpp"
+ #include "memory/heapInspection.hpp"
+ #include "memory/oopFactory.hpp"

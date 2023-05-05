@@ -1,6 +1,6 @@
 --- a/src/effects/overview/qml/DesktopBar.qml
 +++ b/src/effects/overview/qml/DesktopBar.qml
-@@ -67,7 +67,11 @@ Item {
+@@ -71,7 +71,11 @@
                      Keys.onRightPressed: nextItemInFocusChain(!LayoutMirroring.enabled).forceActiveFocus(Qt.TabFocusReason);
  
                      function activate() {
@@ -13,7 +13,7 @@
                      }
  
                      function remove() {
-@@ -98,48 +102,16 @@ Item {
+@@ -95,48 +99,16 @@
                          DesktopView {
                              id: thumbnail
  
@@ -64,12 +64,11 @@
                          }
  
                          OpacityMask {
-@@ -156,7 +128,7 @@ Item {
+@@ -131,6 +131,7 @@
                              border.width: 2
-                             border.color: PlasmaCore.ColorScope.highlightColor
-                             opacity: dropArea.containsDrag ? 0.5 : 1.0
--                            visible: !thumbnail.scaled && (delegate.activeFocus || dropArea.containsDrag || bar.selectedDesktop === delegate.desktop)
-+                            visible: (delegate.activeFocus || dropArea.containsDrag || bar.selectedDesktop === delegate.desktop)
+                             border.color: active ? PlasmaCore.ColorScope.highlightColor : PlasmaCore.ColorScope.textColor
+                             opacity: dropArea.containsDrag || !active ? 0.5 : 1.0
++			    visible: (delegate.activeFocus || dropArea.containsDrag || bar.selectedDesktop === delegate.desktop)
                          }
  
                          MouseArea {
