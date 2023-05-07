@@ -1,0 +1,112 @@
+--- a/src/portable.cpp
++++ b/src/portable.cpp
+@@ -13,6 +13,7 @@
+ #define _WIN32_DCOM
+ #include <windows.h>
+ #else
++#define _GNU_SOURCE
+ #include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+@@ -34,11 +34,6 @@
+ #include "debug.h"
+ #endif
+ 
+-#if !defined(_WIN32) || defined(__CYGWIN__)
+-static bool environmentLoaded = false;
+-static std::map<std::string,std::string> proc_env = std::map<std::string,std::string>();
+-#endif
+-
+ 
+ //---------------------------------------------------------------------------------------------------------
+ 
+@@ -273,86 +268,19 @@
+   return pid;
+ }
+ 
+-#if !defined(_WIN32) || defined(__CYGWIN__)
+-void loadEnvironment()
+-{
+-  if(environ != NULL)
+-  {
+-    unsigned int i = 0;
+-    char* current = environ[i];
+-
+-    while(current != NULL)                            // parse all strings contained by environ til the last element (NULL)
+-    {
+-      std::string env_var(current);                   // load current environment variable string
+-      size_t pos = env_var.find("=");
+-      if(pos != std::string::npos)                    // only parse the variable, if it is a valid environment variable...
+-      {                                               // ...which has to contain an equal sign as delimiter by definition
+-        std::string name = env_var.substr(0,pos);     // the string til the equal sign contains the name
+-        std::string value = env_var.substr(pos + 1);  // the string from the equal sign contains the value
+-
+-        proc_env[name] = value;                       // save the value by the name as its key in the classes map
+-      }
+-      i++;
+-      current = environ[i];
+-    }
+-  }
+-
+-  environmentLoaded = true;
+-}
+-#endif
+-
+ void Portable::setenv(const QCString &name,const QCString &value)
+ {
+-#if defined(_WIN32) && !defined(__CYGWIN__)
+-    SetEnvironmentVariable(name.data(),!value.isEmpty() ? value.data() : "");
+-#else
+-    if(!environmentLoaded) // if the environment variables are not loaded already...
+-    {                                 // ...call loadEnvironment to store them in class
+-      loadEnvironment();
+-    }
+-
+-    proc_env[name.str()] = value.str(); // create or replace existing value
+-#endif
++    ::setenv(name.data(), value.isEmpty() ? "" : value.data(), 1);
+ }
+ 
+ void Portable::unsetenv(const QCString &variable)
+ {
+-#if defined(_WIN32) && !defined(__CYGWIN__)
+-    SetEnvironmentVariable(variable.data(),0);
+-#else
+-    /* Some systems don't have unsetenv(), so we do it ourselves */
+-    if (variable.isEmpty() || variable.find('=')!=-1)
+-    {
+-      return; // not properly formatted
+-    }
+-
+-    auto it = proc_env.find(variable.str());
+-    if (it != proc_env.end())
+-    {
+-      proc_env.erase(it);
+-    }
+-#endif
++    ::unsetenv(variable.data());
+ }
+ 
+ QCString Portable::getenv(const QCString &variable)
+ {
+-#if defined(_WIN32) && !defined(__CYGWIN__)
+-    return ::getenv(variable.data());
+-#else
+-    if(!environmentLoaded) // if the environment variables are not loaded already...
+-    {                      // ...call loadEnvironment to store them in class
+-      loadEnvironment();
+-    }
+-
+-    if (proc_env.find(variable.str()) != proc_env.end())
+-    {
+-      return QCString(proc_env[variable.str()]);
+-    }
+-    else
+-    {
+-      return QCString();
+-    }
+-#endif
++    return secure_getenv(variable.data());
+ }
+ 
+ FILE *Portable::fopen(const QCString &fileName,const QCString &mode)
