@@ -106,7 +106,7 @@
 -      return QCString();
 -    }
 -#endif
-+    return secure_getenv(variable.data());
++    return ::getenv(variable.data());
  }
  
  FILE *Portable::fopen(const QCString &fileName,const QCString &mode)

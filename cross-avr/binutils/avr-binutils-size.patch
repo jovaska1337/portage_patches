@@ -1,5 +1,14 @@
 --- a/binutils/size.c
 +++ b/binutils/size.c
+@@ -17,7 +17,7 @@
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+    MA 02110-1301, USA.  */
+-
++
+ /* Extensions/incompatibilities:
+    o - BSD output has filenames at the end.
+    o - BSD output can appear in different radicies.
 @@ -34,8 +34,24 @@
  #include "getopt.h"
  #include "bucomm.h"
@@ -46,7 +55,7 @@
  
  static int show_version = 0;
  static int show_help = 0;
-@@ -74,6 +85,243 @@
+@@ -74,6 +85,244 @@
  /* Program exit status.  */
  static int return_code = 0;
  
@@ -81,6 +90,7 @@
 +    long eeprom;
 +} avr_device_t;
 +
++// FIXME: this list should probably be updated
 +avr_device_t avr[] =
 +{
 +    {"atxmega256a3",  AVR264K, AVR16K, AVR4K},
@@ -290,25 +300,26 @@
  static char *target = NULL;
  
  /* Forward declarations.  */
-@@ -89,21 +337,16 @@
+@@ -81,7 +330,7 @@
+ static void display_file (char *);
+ static void rprint_number (int, bfd_size_type);
+ static void print_sizes (bfd * file);
+-
++
+ static void
+ usage (FILE *stream, int status)
+ {
+@@ -89,22 +338,18 @@
    fprintf (stream, _(" Displays the sizes of sections inside binary files\n"));
    fprintf (stream, _(" If no input file(s) are specified, a.out is assumed\n"));
    fprintf (stream, _(" The options are:\n\
 -  -A|-B|-G  --format={sysv|berkeley|gnu}  Select output style (default is %s)\n\
 -  -o|-d|-x  --radix={8|10|16}         Display numbers in octal, decimal or hex\n\
 -  -t        --totals                  Display the total sizes (Berkeley only)\n\
+-  -f                                  Ignored.\n\
 -            --common                  Display total size for *COM* syms\n\
 -            --target=<bfdname>        Set the binary file format\n\
 -            @<file>                   Read options from <file>\n\
--  -h        --help                    Display this information\n\
--  -v        --version                 Display the program's version\n\
--\n"),
--#if BSD_DEFAULT
--  "berkeley"
--#else
--  "sysv"
--#endif
--);
 +  -A|-B|-G|-C  --format={sysv|berkeley|gnu|avr}  Select output style (default is %s)\n\
 +  -o|-d|-x     --radix={8|10|16}         Display numbers in octal, decimal or hex\n\
 +               --mcu=<avrmcu>            MCU name for AVR format only\n\
@@ -318,11 +329,20 @@
 +               @<file>                   Read options from <file>\n\
 +  -h           --help                    Display this information\n\
 +  -v           --version                 Display the program's version\n\
+   -h|-H|-?  --help                    Display this information\n\
+   -v|-V     --version                 Display the program's version\n\
+-\n"),
+-#if BSD_DEFAULT
+-  "berkeley"
+-#else
+-  "sysv"
+-#endif
+-);
 +\n"), FORMAT_NAME);
    list_supported_targets (program_name, stream);
    if (REPORT_BUGS_TO[0] && status == 0)
      fprintf (stream, _("Report bugs to %s\n"), REPORT_BUGS_TO);
-@@ -113,6 +356,7 @@
+@@ -114,6 +359,7 @@
  #define OPTION_FORMAT (200)
  #define OPTION_RADIX (OPTION_FORMAT + 1)
  #define OPTION_TARGET (OPTION_RADIX + 1)
@@ -330,7 +350,7 @@
  
  static struct option long_options[] =
  {
-@@ -120,6 +364,7 @@
+@@ -121,6 +367,7 @@
    {"format", required_argument, 0, OPTION_FORMAT},
    {"radix", required_argument, 0, OPTION_RADIX},
    {"target", required_argument, 0, OPTION_TARGET},
@@ -338,7 +358,7 @@
    {"totals", no_argument, &show_totals, 1},
    {"version", no_argument, &show_version, 1},
    {"help", no_argument, &show_help, 1},
-@@ -151,7 +396,7 @@
+@@ -152,13 +399,17 @@
      fatal (_("fatal error: libbfd ABI mismatch"));
    set_default_bfd_target ();
  
@@ -347,17 +367,17 @@
  			   (int *) 0)) != EOF)
      switch (c)
        {
-@@ -170,12 +415,20 @@
- 	  case 'g':
- 	    selected_output_format = FORMAT_GNU;
- 	    break;
+       case OPTION_FORMAT:
+ 	switch (*optarg)
+ 	  {
 +	  case 'A':
 +	  case 'a':
 +	    selected_output_format = FORMAT_AVR;
 +	    break;
- 	  default:
- 	    non_fatal (_("invalid argument to --format: %s"), optarg);
- 	    usage (stderr, 1);
+ 	  case 'B':
+ 	  case 'b':
+ 	    selected_output_format = FORMAT_BERKLEY;
+@@ -177,6 +428,10 @@
  	  }
  	break;
  
@@ -368,17 +388,35 @@
        case OPTION_TARGET:
  	target = optarg;
  	break;
-@@ -212,6 +465,9 @@
+@@ -213,6 +468,9 @@
        case 'G':
  	selected_output_format = FORMAT_GNU;
  	break;
 +      case 'C':
-+        selected_output_format = FORMAT_AVR;
++	selected_output_format = FORMAT_GNU;
 +	break;
        case 'v':
        case 'V':
  	show_version = 1;
-@@ -654,13 +910,117 @@
+@@ -282,7 +540,7 @@
+ 
+   return return_code;
+ }
+-
++
+ /* Total size required for common symbols in ABFD.  */
+ 
+ static void
+@@ -435,7 +693,7 @@
+       return;
+     }
+ }
+-
++
+ static int
+ size_number (bfd_size_type num)
+ {
+@@ -649,13 +907,117 @@
    printf ("\n\n");
  }
  
