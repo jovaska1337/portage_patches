@@ -372,7 +372,7 @@
  	  {
 +	  case 'A':
 +	  case 'a':
-+	    selected_output_format = FORMAT_AVR;
++	    selected_output_format = FORMAT_SYSV;
 +	    break;
  	  case 'B':
  	  case 'b':
@@ -393,7 +393,7 @@
  	selected_output_format = FORMAT_GNU;
  	break;
 +      case 'C':
-+	selected_output_format = FORMAT_GNU;
++	selected_output_format = FORMAT_AVR;
 +	break;
        case 'v':
        case 'V':
