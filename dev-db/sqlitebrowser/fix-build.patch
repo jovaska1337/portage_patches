@@ -1,0 +1,20 @@
+--- a/src/FileDialog.cpp
++++ b/src/FileDialog.cpp
+@@ -48,7 +48,7 @@
+     case 2: {   // Remember last location for current session only
+         QHash<QString, QVariant> lastLocations = Settings::getValue("db", "lastlocations").toHash();
+ 
+-        return lastLocations[QString(QChar(dialogType))].toString();
++        return lastLocations[QString(QChar((int)dialogType))].toString();
+     }
+     case 1:     // Always use this locations
+         return Settings::getValue("db", "defaultlocation").toString();
+@@ -62,7 +62,7 @@
+     QString dir = QFileInfo(new_path).absolutePath();
+     QHash<QString, QVariant> lastLocations = Settings::getValue("db", "lastlocations").toHash();
+ 
+-    lastLocations[QString(QChar(dialogType))] = dir;
++    lastLocations[QString(QChar((int)dialogType))] = dir;
+ 
+     switch(Settings::getValue("db", "savedefaultlocation").toInt())
+     {
