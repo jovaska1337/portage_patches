@@ -1,0 +1,22 @@
+--- a/kernel/include/linux/netfilter/ipset/ip_set_compat.h.in
++++ b/kernel/include/linux/netfilter/ipset/ip_set_compat.h.in
+@@ -513,7 +513,7 @@
+ #endif
+ 
+ #ifndef HAVE_TIMER_SHUTDOWN_SYNC
+-#define timer_shutdown_sync(timer)	del_timer_sync(timer)
++#define timer_shutdown_sync(timer)	timer_delete_sync(timer)
+ #endif
+ 
+ #ifndef HAVE_STRSCPY
+--- a/kernel/net/netfilter/ipset/ip_set_bitmap_gen.h
++++ b/kernel/net/netfilter/ipset/ip_set_bitmap_gen.h
+@@ -298,7 +298,7 @@
+ 	struct mtype *map = set->data;
+ 
+ 	if (SET_WITH_TIMEOUT(set))
+-		del_timer_sync(&map->gc);
++		timer_delete_sync(&map->gc);
+ }
+ 
+ static const struct ip_set_type_variant mtype = {
