@@ -1,0 +1,2 @@
+# prevent picking up patched from package
+gtk3-classic*.patch
